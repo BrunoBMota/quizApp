@@ -2,8 +2,7 @@
  * Example store structure
  */
 'use strict'
-let lastAnswer = false;
-let questions = {
+let store = {
   // 5 or more questions are required
   questions: [
     {
@@ -59,7 +58,9 @@ let questions = {
   ],
   quizStarted: false,
   questionNumber: 0,
-  score: 0
+  score: 0,
+  feedback: false,
+  feedbackScreen: false
 };
 /**
  * 
@@ -81,34 +82,33 @@ let questions = {
 function introView(){
   return `
   <div class="introView">
-      <h1>Video Game Trivia!</h1>
-      <h2>Score 3/5 to win!</h2>
-      <button>Start</button>
+      <h2>Score ${Math.round(store['questions'].length/2)}/${store['questions'].length} to win!</h2>
+      <button id="start">Start</button>
     </div>
   `;
 }
 
 function questionView(){
-  let question = questions.questions[questions['questionNumber']];
+  let questions = store['questions'];
   return `
   <div class="questionView">
-      <h1>Question ${questions['questionNumber'] + 1} of 5</h1>
+      <h1>Question ${store['questionNumber'] + 1} of 5</h1>
       <div class="questionContainer">
-        <p>${question['question']}</p>
-        <form>
+        <p>${questions[store['questionNumber']]['question']}</p>
+        <form action="/">
           <input type="radio" name="selection" id="a" value="a">
-          <label for="">A. ${question['answers'][0]}</label>
+          <label for="a">A. ${questions[store['questionNumber']]['answers'][0]}</label>
           <br>
           <input type="radio" name="selection" id="b" value="b">
-          <label for="">B. ${question['answers'][1]}</label>
+          <label for="b">B. ${questions[store['questionNumber']]['answers'][1]}</label>
           <br>
           <input type="radio" name="selection" id="c" value="c">
-          <label for="">C. ${question['answers'][2]}</label>
+          <label for="c">C. ${questions[store['questionNumber']]['answers'][2]}</label>
           <br>
           <input type="radio" name="selection" id="d" value="d">
-          <label for="">D. ${question['answers'][3]}</label>
+          <label for="d">D. ${questions[store['questionNumber']]['answers'][3]}</label>
           <br>
-          ${questions['questionNumber'] === 4 ? `<input type="button" name="final-submit" id="final" value="SUBMIT FINAL RESULTS">` : `<input type="button" name="next-submit" id="next" value="SUBMIT">`}
+          ${store['questionNumber'] === 4 ? `<input type="button" name="final-submit" id="final" value="SUBMIT FINAL RESULTS">` : `<input type="button" name="next-submit" id="next" value="SUBMIT">`}
         </form>
       </div>
     </div>
@@ -118,15 +118,18 @@ function questionView(){
 function feedbackView(){
   return `
   <div class="feedbackView">
-      <p>${lastAnswer ? 'correct': 'incorrect'}</p>
-      <p>{if incorrect will display the correct answer. else will just display good job}</p>
-      <button>Continue</button>
+      <p>${store['feedback'] ? 'Correct!': 'Incorrect!'}</p>
+      <p>${!store['feedback'] ? `The correct answer was: `: 'Good Job!'}</p>
+      <button id="continue">Continue</button>
     </div>
   `;
 }
 
-
 function resultsView(){
+  let winMessage = 'Congratulations!';
+  let loseMessage = 'Better luck next time!';
+
+
   return `
   <div class="resultsView">
       <div class="resultsContainer">
@@ -134,77 +137,98 @@ function resultsView(){
         <h3>Score: </h3>
         <ul>
           <li>
-            <p>Correct {#}</p>
+            <p>Correct: ${store['score']}</p>
           </li>
           <li>
-            <p>Incorret {#}</p>
+            <p>Incorret: ${Math.abs(store['score'] - store['questions'].length)}</p>
           </li>
         </ul>
       </div>
-      <p>{Results Message}</p>
-      <button>NEW GAME</button>
+      <p>${store['score'] >= 3 ? winMessage : loseMessage} Press the button below to start a new game!</p>
+      <button id="new">NEW GAME</button>
     </div>
   `;
 }
 
-
 /********** RENDER FUNCTION(S) **********/
 // This function conditionally replaces the contents of the <main> tag based on the state of the store
-function renderIntroView(){
-  $('main').html(introView());
-}
-
-function renderQuestionView(){
-  $('main').html(questionView());
-}
-
-function renderFeedbackView(){
-  $('main').html(feedbackView());
-}
-
-function renderResultsView(){
-  $('main').html(resultsView());
+function renderModel(){
+  //todo
+  if(store['quizStarted'] === false){
+    $('main').html(introView);
+  }
+  else if(store['questionNumber'] === 5){
+    $('main').html(resultsView);
+  }
+  else if(store['feedbackScreen'] === true){
+    //todo
+    $('main').html(feedbackView);
+  }
+  else{
+    $('main').html(questionView);
+  }
 }
 
 /********** EVENT HANDLER FUNCTIONS **********/
 // These functions handle events (submit, click, etc)
-function submitAnswer(event){
-  event.preventDefault();
-  if(questions['questionNumber'] < 4){
-    if($('input[name=selection]:checked').val() === questions.questions[questions['questionNumber']].correctAnswer){
-      console.log('correct');
-      lastAnswer = true;
-      questions['questionNumber']++;
-      questions['score']++;
-    }
-    else{
-      console.log('false');
-      lastAnswer = false;
-      questions['questionNumber']++;
-    }
-    renderFeedbackView();
+function submitAnswer(){
+  if($('input[name=selection]:checked').val() === store['questions'][store['questionNumber']]['correctAnswer']){
+    store['feedback'] = true;
+    store['questionNumber']++;
+    store['score']++;
   }
+  else{
+    store['feedback'] = false;
+    store['questionNumber']++;
+  }
+  store['feedbackScreen'] = true;
+}
 
-  if(questions['questionNumber'] === 4){
-    if($('input[name=selection]:checked').val() === questions.questions[questions['questionNumber']].correctAnswer){
-      console.log('correct');
-      lastAnswer = true;
-      questions['score']++;
-    }
-    else{
-      console.log('false');
-      lastAnswer = false;
-    }
-  }
+function handleStart(){
+  $('main').on('click', '#start', function(event){
+    store['quizStarted'] = true;
+    renderModel();
+  });
+}
+
+function handleNext(){
+  $('main').on('click', '#next', function(event){
+    submitAnswer();
+    renderModel();
+  });
+}
+
+function handleContinue(){
+  $('main').on('click', '#continue', function(event){
+    store['feedbackScreen'] = false;
+    renderModel();
+  });
+}
+
+function handleSubmit(){
+  $('main').on('click', '#final', function(event){
+    submitAnswer();
+    renderModel();
+  });
+}
+
+function handleNewGame(){
+  $('main').on('click', '#new', function(event){
+    store['score'] = 0;
+    store['questionNumber'] = 0;
+    store['feedbackScreen'] = false;
+    store['quizStarted'] = false;
+    renderModel();
+  });
 }
 
 function main(){
-  renderIntroView();
+  renderModel();
+  handleStart();
+  handleNext();
+  handleContinue();
+  handleSubmit();
+  handleNewGame();
 }
-
-$('main').on('click', '#next', submitAnswer);
-$('main').on('click', 'button', renderQuestionView);
-$('main').on('click', '#final', renderResultsView);
-
 
 $(main);

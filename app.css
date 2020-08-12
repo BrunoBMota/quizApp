@@ -1,5 +1,11 @@
 /* Your styles should be mobile-first and responsive */
-
+.introView {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid red;
+}
 /** 
   * If you are unclear on how to utilize a mobile-first, responsive technique to write your CSS, here is an example: 
   *
