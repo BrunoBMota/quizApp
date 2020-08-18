@@ -121,7 +121,7 @@ function questionView(){
             <input type="radio" name="selection" id="d" value="d" >
             <label for="d">D. ${questions[store['questionNumber']]['answers'][3]}</label>
           </fieldset>
-          ${store['questionNumber'] === 4 ? `<input type="button" name="final-submit" id="final" value="SUBMIT FINAL RESULTS">` : `<input type="button" name="next-submit" id="next" value="SUBMIT">`}
+          ${store['questionNumber'] === 4 ? `<input type="submit" name="final-submit" id="final" value="SUBMIT FINAL RESULTS">` : `<input type="submit" name="next-submit" id="next" value="SUBMIT">`}
         </form>
       </div>
       <h1>Correct answers: ${store['score']} of ${store['questions'].length}</h1>
