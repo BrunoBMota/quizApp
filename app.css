@@ -12,6 +12,7 @@ body {
 header h1 {
   text-align: center;
   color: #fff;
+  font-size: 24px;
 }
 
 main {
@@ -21,8 +22,7 @@ main {
 
 button, input[type = button] {
   margin: 10px 0;
-  background-color: #9999ff; 
-  color: white; 
+  background-color: #9999ff;  
   border: none;
   padding: 8px 15px;
   font-size: 15px;
@@ -31,9 +31,9 @@ button, input[type = button] {
   border-radius: 8px;
 }
 
-button:hover, input[type = button]:hover, button:active, input[type = button]:active { 
-  background-color: white; 
-  color: #9999ff; 
+button:hover, input[type = button]:hover, button:active, input[type = button]:active, button:focus, input[type = button]:focus  { 
+  background-color: #5757ff;
+  color: #fff;
 }
 
 .introView {
@@ -70,11 +70,16 @@ button:hover, input[type = button]:hover, button:active, input[type = button]:ac
 
 .questionView h1 {
   color: #fff;
+  font-size: 18px;
 }
 
 .questionContainer {
   background-color: #ddd;
-  padding: 0 10px;
+  width: 100%;
+}
+
+.questionContainer form {
+  padding: 10px;
 }
 
 .questionContainer input[type = radio] {
@@ -84,6 +89,16 @@ button:hover, input[type = button]:hover, button:active, input[type = button]:ac
 .feedbackView {
   background-color: #ddd;
   padding-bottom: 30px;
+}
+
+.feedbackView #statement {
+  font-size: 12px;
+  text-align: left;
+  padding-left: 20px;
+}
+
+.feedbackView h2 {
+  font-size: 16px;
 }
 
 .resultsView {

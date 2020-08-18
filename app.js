@@ -6,14 +6,16 @@ let store = {
   // 5 or more questions are required
   questions: [
     {
-      question: ' What was the name of the halo ring that Master Chief destroys at the end of Halo 3?',
+      question: 'What was the name of the halo ring that Master Chief destroys at the end of Halo 3?',
       answers: [
         'Installation 00',
         'The Ark',
         'Installation 08',
         'Installation 04'
       ],
-      correctAnswer: 'c'
+      correctAnswer: 'c',
+      correctAnswerChoice: 'Installation 08',
+      correctAnswerStatement: 'Installation 08 was a partially completed Halo ring which was constructed at the Ark after the destruction of Installation 04. Incomplete to the point where firing would result in its destruction, this replacement was destroyed by Spartan-II Master Chief John-117 at the end of Halo 3 in order to end the flood threat.'
     },
     {
       question: 'What city did the Locust attack occur in at the start of Gears of War 2?',
@@ -23,7 +25,9 @@ let store = {
         'Tyrus',
         'Jacinto City'
       ],
-      correctAnswer: 'd'
+      correctAnswer: 'd',
+      correctAnswerChoice: 'Jacinto City',
+      correctAnswerStatement: 'With the Locust Horde suffering from massive losses and a damaged infrastructure from the Lightmass Offensive, the Horde decided that the only way to defeat the Humans was to attack their last bastion of hope: Jacinto City.'
     },
     {
       question: 'What was the name of the town that Mario had to clean up while on vacation?',
@@ -33,7 +37,9 @@ let store = {
         'Toad Town',
         'Cheep-Cheep Island',
       ],
-      correctAnswer: 'b'
+      correctAnswer: 'b',
+      correctAnswerChoice: 'Delfino Island',
+      correctAnswerStatement: 'As Shadow Mario wreaked havoc on the island. Mario gets framed for causing havoc among the island and he can\'t leave until he cleans up the mess.'
     },
     {
       question: 'What is Sonic the Hedgehog\'s nemesis name?',
@@ -43,7 +49,9 @@ let store = {
         'Rouge',
         'Dr. Eggman',
       ],
-      correctAnswer: 'd'
+      correctAnswer: 'd',
+      correctAnswerChoice: 'Dr. Eggman',
+      correctAnswerStatement: 'Dr. Ivo Robotnik (also known as Dr. Eggman) is an evil scientist and dictator who seeks to rule over the entire world and turn it into his personal Eggman Empire. With his Egg Army, Badnik Horde, and airships, he is ever persistent in his quest for world domination despite his constant losses at the hands of his most hated enemy Sonic the Hedgehog and his allies, the Freedom Fighters.'
     },
     {
       question: 'Where is Link from?',
@@ -53,7 +61,9 @@ let store = {
         'Hyrule',
         'Gerudo Valley',
       ],
-      correctAnswer: 'b'
+      correctAnswer: 'b',
+      correctAnswerChoice: 'Kakariko Forest',
+      correctAnswerStatement: 'In the Ocarina of Time (1998) Links home location is first portrayed in the Kakariko Forest'
     },
   ],
   quizStarted: false,
@@ -82,7 +92,7 @@ let store = {
 function introView(){
   return `
   <div class="introView">
-      <h2>Score ${Math.round(store['questions'].length/2)}/${store['questions'].length} to win!</h2>
+      <h2>Score ${Math.round(store['questions'].length/2)} of ${store['questions'].length} to win!</h2>
       <button id="start">START</button>
     </div>
   `;
@@ -94,32 +104,41 @@ function questionView(){
   <div class="questionView">
       <h1>Question ${store['questionNumber'] + 1} of 5</h1>
       <div class="questionContainer">
-        <p>${questions[store['questionNumber']]['question']}</p>
         <form action="/">
-          <input type="radio" name="selection" id="a" value="a">
-          <label for="a">A. ${questions[store['questionNumber']]['answers'][0]}</label>
-          <br>
-          <input type="radio" name="selection" id="b" value="b">
-          <label for="b">B. ${questions[store['questionNumber']]['answers'][1]}</label>
-          <br>
-          <input type="radio" name="selection" id="c" value="c">
-          <label for="c">C. ${questions[store['questionNumber']]['answers'][2]}</label>
-          <br>
-          <input type="radio" name="selection" id="d" value="d">
-          <label for="d">D. ${questions[store['questionNumber']]['answers'][3]}</label>
-          <br>
+          <fieldset>
+            <legend>
+              <p>${questions[store['questionNumber']]['question']}</p>
+            </legend>
+            <input type="radio" name="selection" id="a" value="a">
+            <label for="a">A. ${questions[store['questionNumber']]['answers'][0]}</label>
+            <br>
+            <input type="radio" name="selection" id="b" value="b" >
+            <label for="b">B. ${questions[store['questionNumber']]['answers'][1]}</label>
+            <br>
+            <input type="radio" name="selection" id="c" value="c" >
+            <label for="c">C. ${questions[store['questionNumber']]['answers'][2]}</label>
+            <br>
+            <input type="radio" name="selection" id="d" value="d" >
+            <label for="d">D. ${questions[store['questionNumber']]['answers'][3]}</label>
+          </fieldset>
           ${store['questionNumber'] === 4 ? `<input type="button" name="final-submit" id="final" value="SUBMIT FINAL RESULTS">` : `<input type="button" name="next-submit" id="next" value="SUBMIT">`}
         </form>
       </div>
+      <h1>Correct answers: ${store['score']} of ${store['questions'].length}</h1>
     </div>
   `;
 }
 
 function feedbackView(){
+  let correctAnswer = store['questions'][store['questionNumber'] - 1]['correctAnswer'].toUpperCase();
+  let correctAnswerChoice = store['questions'][store['questionNumber'] - 1]['correctAnswerChoice'];
+  let correctAnswerStatement = store['questions'][store['questionNumber'] - 1]['correctAnswerStatement'];
   return `
   <div class="feedbackView">
     <h2>${store['feedback'] ? 'Correct!': 'Incorrect!'}</h2>
-    <p>${!store['feedback'] ? `The correct answer was: ${store['questions'][store['questionNumber'] - 1]['correctAnswer']}`: 'Good Job!'}</p>
+    <p>${!store['feedback'] ? `The correct answer was: <br>${correctAnswer}. ${correctAnswerChoice}`: 'Good Job!'}</p>
+    ${!store['feedback'] ? `<p id="statement">${correctAnswerStatement}</p>`: ''}
+    <h2>Correct answers: ${store['score']} of ${store['questions'].length}</h2>
     <button id="continue">CONTINUE</button>
   </div>
   `;
@@ -154,15 +173,13 @@ function resultsView(){
 /********** RENDER FUNCTION(S) **********/
 // This function conditionally replaces the contents of the <main> tag based on the state of the store
 function renderModel(){
-  //todo
   if(store['quizStarted'] === false){
     $('main').html(introView);
   }
-  else if(store['questionNumber'] === 5){
+  else if(store['questionNumber'] === 5 && store['feedbackScreen'] === false){
     $('main').html(resultsView);
   }
   else if(store['feedbackScreen'] === true){
-    //todo
     $('main').html(feedbackView);
   }
   else{
@@ -173,16 +190,21 @@ function renderModel(){
 /********** EVENT HANDLER FUNCTIONS **********/
 // These functions handle events (submit, click, etc)
 function submitAnswer(){
-  if($('input[name=selection]:checked').val() === store['questions'][store['questionNumber']]['correctAnswer']){
-    store['feedback'] = true;
-    store['questionNumber']++;
-    store['score']++;
+  if($('input:radio[name=selection]:checked')['length'] > 0){
+    if($('input[name=selection]:checked').val() === store['questions'][store['questionNumber']]['correctAnswer']){
+      store['feedback'] = true;
+      store['questionNumber']++;
+      store['score']++;
+    }
+    else{
+      store['feedback'] = false;
+      store['questionNumber']++;
+    }
+    store['feedbackScreen'] = true;
   }
   else{
-    store['feedback'] = false;
-    store['questionNumber']++;
+    alert('Please select at least one choice.');
   }
-  store['feedbackScreen'] = true;
 }
 
 function handleStart(){
